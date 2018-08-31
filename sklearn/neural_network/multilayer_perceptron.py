@@ -413,7 +413,7 @@ class BaseMultilayerPerceptron(six.with_metaclass(ABCMeta, BaseEstimator)):
                              % self.n_iter_no_change)
 
         # raise ValueError if not registered
-        supported_activations = ('identity', 'logistic', 'tanh', 'relu')
+        supported_activations = ('identity', 'logistic', 'tanh', 'relu', 'leaky_relu')
         if self.activation not in supported_activations:
             raise ValueError("The activation '%s' is not supported. Supported "
                              "activations are %s." % (self.activation,
@@ -693,7 +693,7 @@ class MLPClassifier(BaseMultilayerPerceptron, ClassifierMixin):
         The ith element represents the number of neurons in the ith
         hidden layer.
 
-    activation : {'identity', 'logistic', 'tanh', 'relu'}, default 'relu'
+    activation : {'identity', 'logistic', 'tanh', 'relu', 'leaky_relu'}, default 'relu'
         Activation function for the hidden layer.
 
         - 'identity', no-op activation, useful to implement linear bottleneck,
@@ -707,6 +707,9 @@ class MLPClassifier(BaseMultilayerPerceptron, ClassifierMixin):
 
         - 'relu', the rectified linear unit function,
           returns f(x) = max(0, x)
+
+        - 'leaky_relu'
+          returns f(x) = max(0.01 * x, x)
 
     solver : {'lbfgs', 'sgd', 'adam'}, default 'adam'
         The solver for weight optimization.
@@ -1076,7 +1079,7 @@ class MLPRegressor(BaseMultilayerPerceptron, RegressorMixin):
         The ith element represents the number of neurons in the ith
         hidden layer.
 
-    activation : {'identity', 'logistic', 'tanh', 'relu'}, default 'relu'
+    activation : {'identity', 'logistic', 'tanh', 'relu', 'leaky_relu'}, default 'relu'
         Activation function for the hidden layer.
 
         - 'identity', no-op activation, useful to implement linear bottleneck,
@@ -1090,6 +1093,9 @@ class MLPRegressor(BaseMultilayerPerceptron, RegressorMixin):
 
         - 'relu', the rectified linear unit function,
           returns f(x) = max(0, x)
+
+        - 'leaky_relu'
+          returns f(x) = max(0.01 * x, x)
 
     solver : {'lbfgs', 'sgd', 'adam'}, default 'adam'
         The solver for weight optimization.

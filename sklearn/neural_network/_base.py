@@ -75,6 +75,29 @@ def relu(X):
     return X
 
 
+def leaky_relu(X):
+    """Compute the leaky rectified linear unit function inplace.
+    Leaky ReLU is defined as max(X, alpha *X) where alpha is
+    a small parameter. A common value for it is 0.01, this is
+    the value used now. So this function acts like ReLU for
+    positive X, while for negative X it returns very small negative
+    values.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix}, shape (n_samples, n_features)
+        The input data.
+
+    Returns
+    -------
+    X_new : {array-like, sparse matrix}, shape (n_samples, n_features)
+        The transformed data.
+    """
+    alpha = 0.01
+    np.fmax(X, X * alpha, out=X)
+    return X
+
+
 def softmax(X):
     """Compute the K-way softmax function inplace.
 
@@ -95,8 +118,12 @@ def softmax(X):
     return X
 
 
-ACTIVATIONS = {'identity': identity, 'tanh': tanh, 'logistic': logistic,
-               'relu': relu, 'softmax': softmax}
+ACTIVATIONS = {'identity': identity,
+               'tanh': tanh,
+               'logistic': logistic,
+               'relu': relu,
+               'leaky_relu': leaky_relu,
+               'softmax': softmax}
 
 
 def inplace_identity_derivative(Z, delta):
@@ -169,10 +196,31 @@ def inplace_relu_derivative(Z, delta):
     delta[Z == 0] = 0
 
 
+def inplace_leaky_relu_derivative(Z, delta):
+    """Apply the derivative of the leaky_relu function.
+
+    It exploits the fact that the derivative is a simple function of the output
+    value from rectified linear units activation function, including its leaky
+    version.
+
+    Parameters
+    ----------
+    Z : {array-like, sparse matrix}, shape (n_samples, n_features)
+        The data which was output from the rectified linear units activation
+        function during the forward pass.
+
+    delta : {array-like}, shape (n_samples, n_features)
+         The backpropagated error signal to be modified inplace.
+    """
+    alpha = 0.01
+    delta[Z <= 0] *= alpha
+
+
 DERIVATIVES = {'identity': inplace_identity_derivative,
                'tanh': inplace_tanh_derivative,
                'logistic': inplace_logistic_derivative,
-               'relu': inplace_relu_derivative}
+               'relu': inplace_relu_derivative,
+               'leaky_relu: inplace_leaky_relu_derivative}
 
 
 def squared_loss(y_true, y_pred):
